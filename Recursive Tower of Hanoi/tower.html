@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>towers of hanoi</title>
+  </head>
+
+  <style>
+    body {
+      background-color: hsl(0, 0%, 10%);
+      display: flex;
+      flex-direction: column;
+      height: 95vh;
+      width: 95vw;
+      align-items: center;
+      justify-content: center;
+    }
+    #mainBox {
+      background-color: hsl(0, 0%, 10%);
+      display: flex;
+      flex-direction: row;
+      height: 80vh;
+      width: 75vw;
+    }
+    .tower {
+      background-color: hsl(0, 0%, 30%);
+      display: flex;
+      flex-direction: column-reverse;
+      flex: 10;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 1vw;
+      padding-right: 1vw;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      flex: 10;
+    }
+    .spacer {
+      background-color: hsl(0, 0%, 10%);
+      display: flex;
+      flex-direction: column;
+      flex: 2;
+    }
+    .spacer2 {
+      background-color: hsl(0, 0%, 10%);
+      display: flex;
+      flex-direction: column;
+      flex: 0.75;
+    }
+    .ring {
+      height: 10vh;
+      width: 15vw;
+    }
+    .horizontalSpreader {
+      display: flex;
+      flex-direction: row;
+      width: 75vw;
+      height: 15vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .headerButton {
+      background-color: hsl(0, 0%, 45%);
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      justify-content: center;
+      padding-top: 1vh;
+      padding-left: 1vw;
+      padding-right: 1vw;
+      width: 10vw;
+      height: 10vh;
+      user-select: none;
+      color: white;
+      font-family: sans-serif;
+    }
+    .verticalSpreader {
+      display: flex;
+      flex-direction: column;
+      width: 10vw;
+      height: 10vh;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+  <body>
+    <br />
+
+    <div id="mainBox">
+      <div id="tower1" class="tower"><div id="-2"></div></div>
+      <div class="spacer"></div>
+      <div id="tower2" class="tower"><div id="-0"></div></div>
+      <div class="spacer"></div>
+      <div id="tower3" class="tower"><div id="-1"></div></div>
+    </div>
+    <br />
+    <div class="horizontalSpreader">
+      <div class="verticalSpreader">
+        <div class="headerButton">rings</div>
+        <div class="headerButton">delay(ms)</div>
+      </div>
+      <div class="verticalSpreader">
+        <input id="input1" class="headerButton" type="number" value="5" />
+        <input id="input2" class="headerButton" type="number" value="500" />
+      </div>
+      <div class="verticalSpreader">
+        <button class="headerButton" onclick="start()">start</button>
+      </div>
+    </div>
+  </body>
+  <script>
+    i = 1;
+    x = 0;
+    totalRings = 0;
+    let ring = null;
+    const randomColor = Math.random() * 360;
+    function createRing(number) {
+      while (x < number) {
+        let newDiv = document.createElement("div");
+        newDiv.className = "ring";
+        newDiv.id = i;
+        console.log(newDiv.id);
+        colorID = randomColor + i * 10;
+        newDiv.style.backgroundColor = "hsl(" + colorID + ",80%,35%)";
+        newDiv.style.width = 105 * ((number - x) / number) + "%";
+        newDiv.onclick = function () {
+          ring = this;
+          console.log(this.id);
+        };
+        document.getElementById("tower1").append(newDiv);
+
+        i++;
+        totalRings++;
+        x++;
+      }
+    }
+    clickCount = 0;
+    function moveBlock(id) {
+      moveTower(ring, source, destination, helper);
+    }
+
+    iteration = 0;
+    async function moveTower(ring, source, destination, helper, delay) {
+      iteration++;
+      if (ring == totalRings) {
+        moveDisk(ring, destination, delay);
+        return;
+      } else {
+        moveTower(ring + 1, source, helper, destination, delay);
+        moveDisk(ring, destination, delay);
+        moveTower(ring + 1, helper, destination, source, delay);
+      }
+    }
+    timer = 0;
+    async function moveDisk(ring, destination, delay) {
+      timer = timer + delay;
+      console.log("moving " + ring + " to " + destination);
+      await sleep(timer);
+      document
+        .getElementById(destination)
+        .append(document.getElementById(ring));
+    }
+    function solve(delay) {
+      done = true;
+      ring = 1;
+      source = "tower1";
+      destination = "tower3";
+      helper = "tower2";
+      moveTower(ring, source, destination, helper, delay);
+    }
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    function start(rings, delay) {
+      createRing(document.getElementById("input1").value);
+      solve(Number(document.getElementById("input2").value));
+    }
+  </script>
+</html>
